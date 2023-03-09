@@ -3,4 +3,4 @@ kind: Component
 images:
 - name: ghcr.io/stefanprodan/podinfo
   newName: ghcr.io/thomasstxyz/podinfo
-  newTag: 1.0.4
+  newTag: 1.0.2
