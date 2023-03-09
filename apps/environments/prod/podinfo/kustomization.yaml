@@ -6,3 +6,30 @@ components:
   - app-version
 namespace: prod-podinfo
 namePrefix: prod-
+
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: podinfo
+  patch: |-
+    - op: replace
+      path: /spec/minReadySeconds
+      value: 4
+- target:
+    kind: Deployment
+    name: podinfo
+  patch: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: podinfo
+    spec:
+      template:
+        spec:
+          containers:
+          - name: podinfod
+            env:
+            - name: PODINFO_UI_COLOR
+              value: "#800f1c"
