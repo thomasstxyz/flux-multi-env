@@ -15,5 +15,5 @@ flux bootstrap github \
 --owner=${GITHUB_USER} \
 --repository=${GITHUB_REPO} \
 --personal \
---path=clusters/my-cluster
+--path=clusters/dev
 ```
