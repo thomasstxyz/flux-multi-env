@@ -8,6 +8,6 @@ spec:
   interval: 10m0s
   provider: generic
   ref:
-    tag: 1.0.4
+    tag: 1.0.4 # {"$imagepolicy": "flux-system:podinfo-dev-env:tag"}
   url: oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env
 
