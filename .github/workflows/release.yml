@@ -1,0 +1,64 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write # needed to write releases
+  id-token: write # needed for keyless signing
+  packages: write # needed for ghcr access
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: fluxcd/flux2/action@main
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.x
+      - uses: imranismail/setup-kustomize@v2
+      # - name: Setup Docker Buildx
+      #   id: buildx
+      #   uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare
+        id: prep
+        run: |
+          VERSION=sha-${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\//}
+          fi
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "REVISION=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+      # - name: Generate images meta
+      #   id: meta
+      #   uses: docker/metadata-action@v4
+      #   with:
+      #     images: |
+      #       docker.io/thomasstxyz/podinfo
+      #       ghcr.io/thomasstxyz/podinfo
+      #     tags: |
+      #       type=raw,value=${{ steps.prep.outputs.VERSION }}
+      #       type=raw,value=latest
+      - name: Publish Flux OCI artifact to GHCR (dev environment)
+        run: |
+          kustomize build apps/environments/dev | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env:${{ steps.prep.outputs.VERSION }} -p - \
+            --source="${{ github.event.repository.html_url }}" \
+            --revision="${GITHUB_REF_NAME}/${GITHUB_SHA}"
+          flux tag artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env:${{ steps.prep.outputs.VERSION }} --tag latest
+      - name: Publish Flux OCI artifact to GHCR (prod environment)
+        run: |
+          kustomize build apps/environments/prod | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-prod-env:${{ steps.prep.outputs.VERSION }} -p - \
+            --source="${{ github.event.repository.html_url }}" \
+            --revision="${GITHUB_REF_NAME}/${GITHUB_SHA}"
+          flux tag artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-prod-env:${{ steps.prep.outputs.VERSION }} --tag latest
