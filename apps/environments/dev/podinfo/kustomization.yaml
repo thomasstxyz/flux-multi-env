@@ -23,4 +23,4 @@ patches:
           - name: podinfod
             env:
             - name: PODINFO_UI_COLOR
-              value: "#27870c"
+              value: "#a7870c"
