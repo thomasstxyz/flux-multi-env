@@ -52,13 +52,13 @@ jobs:
       #       type=raw,value=latest
       - name: Publish Flux OCI artifact to GHCR (dev environment)
         run: |
-          kustomize build apps/environments/dev | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env:${{ steps.prep.outputs.VERSION }} -p - \
+          kustomize build apps/environments/dev/podinfo | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env:${{ steps.prep.outputs.VERSION }} - \
             --source="${{ github.event.repository.html_url }}" \
             --revision="${GITHUB_REF_NAME}/${GITHUB_SHA}"
           flux tag artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-dev-env:${{ steps.prep.outputs.VERSION }} --tag latest
       - name: Publish Flux OCI artifact to GHCR (prod environment)
         run: |
-          kustomize build apps/environments/prod | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-prod-env:${{ steps.prep.outputs.VERSION }} -p - \
+          kustomize build apps/environments/prod/podinfo | flux push artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-prod-env:${{ steps.prep.outputs.VERSION }} - \
             --source="${{ github.event.repository.html_url }}" \
             --revision="${GITHUB_REF_NAME}/${GITHUB_SHA}"
           flux tag artifact oci://ghcr.io/thomasstxyz/manifests/podinfo-prod-env:${{ steps.prep.outputs.VERSION }} --tag latest
