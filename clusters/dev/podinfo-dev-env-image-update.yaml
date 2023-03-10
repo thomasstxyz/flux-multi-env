@@ -2,20 +2,20 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
-  name: podinfo
+  name: podinfo-dev-env
   namespace: flux-system
 spec:
-  image: ghcr.io/thomasstxyz/podinfo
+  image: ghcr.io/thomasstxyz/manifests/podinfo-dev-env
   interval: 1m0s
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
-  name: podinfo
+  name: podinfo-dev-env
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: podinfo
+    name: podinfo-dev-env
   policy:
     semver:
       range: 1.0.x
@@ -23,7 +23,7 @@ spec:
 apiVersion: image.toolkit.fluxcd.io/v1beta1
 kind: ImageUpdateAutomation
 metadata:
-  name: flux-system
+  name: podinfo-dev-env
   namespace: flux-system
 spec:
   interval: 1m0s
@@ -42,5 +42,5 @@ spec:
     push:
       branch: main
   update:
-    path: ./apps/environments/dev
+    path: ./clusters/dev
     strategy: Setters
